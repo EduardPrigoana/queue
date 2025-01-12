@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Queue Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #000000;
+        }
+        form {
+            margin: 20px auto;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #000000;
+        }
+        iframe {
+            width: 100%;
+            border: none;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <h1>Queue</h1>
+    <form id="addSongForm" onsubmit="addSong(event)">
+        <input type="text" id="songInput" name="song_name" placeholder="Adauga melodie sau artist   " required>
+        <button type="submit">Adauga</button>
+    </form>
+    <div class="message" id="message"></div>
+    <!-- Queue Table Embedded in an iframe -->
+    <iframe src="/queue_table" id="queueIframe"></iframe>
+    <script>
+        // Function to handle song addition via GET request
+        async function addSong(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            const songInput = document.getElementById("songInput");
+            const messageDiv = document.getElementById("message");
+            const songName = encodeURIComponent(songInput.value);
+
+            // Clear message and disable input/button during request
+            messageDiv.textContent = "Adding song...";
+            songInput.disabled = true;
+
+            try {
+                // Send GET request to add song
+                const response = await fetch(`/add?song_name=${songName}`);
+                const data = await response.json();
+
+                // Update message based on the response
+                if (response.ok) {
+                    messageDiv.textContent = data.message || "Song added successfully!";
+                    messageDiv.className = "message success";
+                } else {
+                    throw new Error(data.error || "Failed to add the song.");
+                }
+            } catch (error) {
+                messageDiv.textContent = error.message;
+                messageDiv.className = "message error";
+            } finally {
+                // Re-enable input and clear it
+                songInput.disabled = false;
+                songInput.value = "";
+            }
+
+            // Reload the iframe to reflect the updated queue
+            document.getElementById("queueIframe").contentWindow.location.reload();
+
+            setTimeout(() => {
+                messageDiv.textContent = "";
+            }, 3000)
+        }
+        // Adjust the iframe height dynamically to avoid scrollbars
+        function resizeIframe() {
+            const iframe = document.getElementById('queueIframe');
+            iframe.style.height = iframe.contentWindow.document.body.scrollHeight+20 + 'px';
+        }
+
+        // Resize iframe after it loads and periodically refresh the iframe
+        const iframe = document.getElementById('queueIframe');
+        iframe.onload = resizeIframe;
+        setInterval(() => {
+            iframe.contentWindow.location.reload();
+        }, 15000);
+
+        // Add event listener for resize events
+        window.addEventListener('resize', resizeIframe);
+    </script>
+</body>
+</html>
