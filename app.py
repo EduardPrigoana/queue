@@ -1,13 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, jsonify
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Flask app
 app = Flask(__name__)
 
-# Spotify API credentials
-CLIENT_ID = "f7f2841e0c26492681499a53b4eca29f"
-CLIENT_SECRET = "8e1a973438214682939b175bb9f1ed1d"
+# Spotify API credentials from environment variables
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:80/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
@@ -23,6 +28,7 @@ sp = Spotify(auth_manager=SpotifyOAuth(
 @app.route("/")
 def home():
     return render_template("index.html")
+    
 
 @app.route("/add", methods=["GET"])
 def add_song():
@@ -58,7 +64,7 @@ def queue_table():
             queue.append({"track": track_name, "artist": artist_name})
     current = None
     if queue_data["currently_playing"]:
-        current = {"track":queue_data["currently_playing"]["name"], "artist":queue_data["currently_playing"]["artists"][0]["name"]}
+        current = {"track": queue_data["currently_playing"]["name"], "artist": queue_data["currently_playing"]["artists"][0]["name"]}
     return render_template("queue_table.html", queue=queue, length=len(queue), now_playing=current)
 
 # Run the Flask app

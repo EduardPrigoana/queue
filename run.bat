@@ -1,1 +1,1 @@
-python app.py
+cmd /K python -m app

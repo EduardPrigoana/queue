@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    >
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Queue Manager</title>
@@ -10,13 +14,9 @@
             text-align: center;
             margin: 0;
             padding: 20px;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #000000;
         }
         form {
-            margin: 20px auto;
+            width: 100%;
         }
         input[type="text"] {
             width: 80%;
@@ -25,34 +25,49 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        button {
-            background-color: #000000;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+            color: #555;
         }
-        button:hover {
-            background-color: #000000;
+        .loading-spinner.active {
+            display: block;
         }
+
+        /* Styling for the iframe to stretch to bottom and hide scrollbar */
         iframe {
             width: 100%;
+            height: calc(100vh); /* Adjusted to leave space for other content */
             border: none;
-            margin-top: 20px;
-            overflow: hidden;
+            overflow: hidden; /* Hide the scrollbar */
+            transition: height 0.3s ease-in-out;
+        }
+        /* Optional: Smooth fade on iframe content changes */
+        iframe.content {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
     <h1>Queue</h1>
     <form id="addSongForm" onsubmit="addSong(event)">
-        <input type="text" id="songInput" name="song_name" placeholder="Adauga melodie sau artist   " required>
-        <button type="submit">Adauga</button>
+        <input type="text" id="songInput" name="song_name" placeholder="Add song or artist" required>
+        <button style="width: 10%;" class="contrast" type="submit">Add</button>
     </form>
     <div class="message" id="message"></div>
-    <!-- Queue Table Embedded in an iframe -->
-    <iframe src="/queue_table" id="queueIframe"></iframe>
+    <!-- Now Playing Widget -->
+    <p>Now Playing:</p>
+    <div class="now-playing" id="nowPlaying">
+        <div id="nowPlayingInfo">
+            Loading now playing...
+        </div>
+    </div>
+
+    <iframe id="queueTable" src="/queue_table" scrolling="no" seamless="seamless"></iframe>
+
     <script>
         // Function to handle song addition via GET request
         async function addSong(event) {
@@ -86,28 +101,56 @@
                 songInput.value = "";
             }
 
-            // Reload the iframe to reflect the updated queue
-            document.getElementById("queueIframe").contentWindow.location.reload();
-
-            setTimeout(() => {
-                messageDiv.textContent = "";
-            }, 3000)
-        }
-        // Adjust the iframe height dynamically to avoid scrollbars
-        function resizeIframe() {
-            const iframe = document.getElementById('queueIframe');
-            iframe.style.height = iframe.contentWindow.document.body.scrollHeight+20 + 'px';
+            // Show loading spinner
+            const loadingSpinner = document.getElementById("loadingSpinner");
+            loadingSpinner.classList.add("active");
         }
 
-        // Resize iframe after it loads and periodically refresh the iframe
-        const iframe = document.getElementById('queueIframe');
-        iframe.onload = resizeIframe;
-        setInterval(() => {
-            iframe.contentWindow.location.reload();
-        }, 15000);
+        // Function to fetch "Now Playing" information
+        async function fetchNowPlaying() {
+            try {
+                const response = await fetch('https://lastplayed.prigoana.com/Labirint84/');
+                const data = await response.json();
 
-        // Add event listener for resize events
-        window.addEventListener('resize', resizeIframe);
+                const track = data.track;
+                if (track && track["@attr"] && track["@attr"].nowplaying === "true") {
+                    const nowPlayingInfo = document.getElementById('nowPlayingInfo');
+                    const nowPlayingImage = document.getElementById('nowPlayingImage');
+
+                    nowPlayingInfo.innerHTML = `${track.name} by ${track.artist["#text"]}`;
+                    nowPlayingImage.innerHTML = `<img src="${track.image[2]["#text"]}" alt="${track.name}">`;
+                }
+            } catch (error) {
+                console.error('Error fetching now playing:', error);
+            }
+        }
+
+        // Call fetchNowPlaying on page load
+        fetchNowPlaying();
+
+        // Set an interval to fetch now playing every 3 seconds
+        setInterval(fetchNowPlaying, 3000);
+
+        // Function to update iframe content
+        async function updateIframeContent() {
+            try {
+                const iframe = document.getElementById("queueTable");
+                const response = await fetch('/queue_table');
+                const html = await response.text();
+
+                // Replace iframe content with smooth transition
+                iframe.srcdoc = html;
+
+                // Optionally: Apply smooth fade in for iframe content
+                iframe.classList.add('content');
+            } catch (error) {
+                console.error('Error updating iframe:', error);
+            }
+        }
+
+        // Update iframe content every 3 seconds
+        setInterval(updateIframeContent, 3000);
+
     </script>
 </body>
 </html>

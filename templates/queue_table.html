@@ -1,63 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                font-family: Arial, sans-serif;
-            }
-            h2 {
-                color: #000000;
-                margin: 10px 0;
-            }
-            .now-playing {
-                text-align: center;
-                margin: 20px 0;
-                font-size: 1.2em;
-            }
-            table {
-                border-collapse: collapse;
-                margin: 0;
-                font-size: 1em;
-                font-family: Arial, sans-serif;
-            }
-            th, td {
-                padding: 12px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-            th {
-                background-color: #000000;
-                color: white;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-            }
-        </style>
-    </head>
+<!doctype html>
+<html lang="en" class="pico">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark" />
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.fuchsia.min.css"
+  >
+    <title>table</title>
+  </head>
 <body>
-    <center>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Track</th>
-                    <th>Artist</th>
+    <center>    <main class="container">
+        <table class="striped" style="table-layout: fixed; overflow: hidden;">
+            <thead style="  text-align: center;">
+                <tr style="  text-align: center;">
+                    <th scope="row" style="  text-align: center;">Track</th>
+                    <th style="  text-align: center;">Artist</th>
                 </tr>
-            </thead>
-            <tbody>
+            </thead style="  text-align: center;">
+            <tbody style="  text-align: center;">
                 {% for i in range(length) %}
-                <tr>
-                    <td>{{ i+1 }}</td>
-                    <td>{{ queue[i].track }}</td>
-                    <td>{{ queue[i].artist }}</td>
+                <tr style="  text-align: center;">
+                    <td style="  text-align: center;">{{ queue[i].track }}</td>
+                    <td style="  text-align: center;">{{ queue[i].artist }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
-        </table></center>
+        </table></center></main>
 </body>
 </html>
