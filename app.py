@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Spotify API credentials from environment variables
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "https://music.prigoana.com/callback"
+REDIRECT_URI = "http://localhost:80/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
 # Spotipy client
@@ -70,4 +70,4 @@ def queue_table():
 
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(port=10000, host="0.0.0.0", debug=True)
+    app.run(port=80, host="0.0.0.0", debug=True)
