@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Spotify API credentials from environment variables
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:80/callback"
+REDIRECT_URI = "http://0.0.0.0/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
 # Spotipy client
@@ -52,7 +52,6 @@ def add_song():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Route to serve the queue table for iframe
 @app.route("/queue_table")
 def queue_table():
     queue_data = sp.queue()
@@ -62,11 +61,27 @@ def queue_table():
         for track in queue_data["queue"]:
             track_name = track["name"]
             artist_name = track["artists"][0]["name"]
-            queue.append({"track": track_name, "artist": artist_name})
+            artist_uri = track["artists"][0]["uri"]  # Get the Spotify URI for the artist
+            artist_link = f"https://open.spotify.com/artist/{artist_uri.split(':')[-1]}"  # Construct the Spotify artist link
+            track_uri = track["uri"]  # Get the Spotify URI for the track
+            track_link = f"https://open.spotify.com/track/{track_uri.split(':')[-1]}"  # Construct the Spotify track link
+            queue.append({
+                "track": track_name,
+                "artist": artist_name,
+                "track_link": track_link,
+                "artist_link": artist_link
+            })
     current = None
     if queue_data["currently_playing"]:
-        current = {"track": queue_data["currently_playing"]["name"], "artist": queue_data["currently_playing"]["artists"][0]["name"]}
+        current_track = queue_data["currently_playing"]
+        current = {
+            "track": current_track["name"],
+            "artist": current_track["artists"][0]["name"],
+            "track_link": f"https://open.spotify.com/track/{current_track['uri'].split(':')[-1]}",
+            "artist_link": f"https://open.spotify.com/artist/{current_track['artists'][0]['uri'].split(':')[-1]}"
+        }
     return render_template("queue_table.html", queue=queue, length=len(queue), now_playing=current)
+
 
 # Run the Flask app
 if __name__ == "__main__":

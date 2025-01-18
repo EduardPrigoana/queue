@@ -11,22 +11,33 @@
     <title>table</title>
   </head>
 <body>
-    <center>    <main class="container">
-        <table class="striped" style="table-layout: fixed; overflow: hidden;">
-            <thead style="  text-align: center;">
-                <tr style="  text-align: center;">
-                    <th scope="row" style="  text-align: center;">Track</th>
-                    <th style="  text-align: center;">Artist</th>
-                </tr>
-            </thead style="  text-align: center;">
-            <tbody style="  text-align: center;">
-                {% for i in range(length) %}
-                <tr style="  text-align: center;">
-                    <td style="  text-align: center;">{{ queue[i].track }}</td>
-                    <td style="  text-align: center;">{{ queue[i].artist }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table></center></main>
+  <center>
+    <main class="container">
+      <table class="striped" style="table-layout: fixed; overflow: hidden; text-align: center;">
+        <thead>
+          <tr>
+            <th scope="col" style="table-layout: fixed; overflow: hidden; text-align: center;">Track</th>
+            <th scope="col"style="table-layout: fixed; overflow: hidden; text-align: center;">Artist</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(length) %}
+          <tr>
+            <td style="table-layout: fixed; overflow: hidden; text-align: center;">
+              <a href="{{ queue[i].track_link }}" target="_blank" rel="noopener noreferrer">
+                {{ queue[i].track }}
+              </a>
+            </td >
+            <td style="table-layout: fixed; overflow: hidden; text-align: center;">
+              <a href="{{ queue[i].artist_link }}" target="_blank" rel="noopener noreferrer">
+                {{ queue[i].artist }}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+  </center>
 </body>
 </html>
