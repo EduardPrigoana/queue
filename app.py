@@ -6,9 +6,9 @@ from spotipy.oauth2 import SpotifyOAuth
 app = Flask(__name__)
 
 # Spotify API credentials
-CLIENT_ID = "d599e0f7a26d419eb6ae618361e1538c"
-CLIENT_SECRET = "af42c3dcdc90448087f8bc597ad551c6"
-REDIRECT_URI = "https://localhost:8888/callback"
+CLIENT_ID = "f7f2841e0c26492681499a53b4eca29f"
+CLIENT_SECRET = "8e1a973438214682939b175bb9f1ed1d"
+REDIRECT_URI = "http://localhost:80/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
 # Spotipy client
