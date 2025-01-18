@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Spotify API credentials from environment variables
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:80/callback"
+REDIRECT_URI = "http://0.0.0.0/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
 # Spotipy client
