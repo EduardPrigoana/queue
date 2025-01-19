@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
@@ -13,17 +13,23 @@ app = Flask(__name__)
 # Spotify API credentials from environment variables
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://0.0.0.0/callback"
 SCOPE = "user-modify-playback-state user-read-playback-state"
 
 # Spotipy client
-sp = Spotify(auth_manager=SpotifyOAuth(
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    redirect_uri=REDIRECT_URI,
-    scope=SCOPE,
-    open_browser=False  # Disable interactive input
-))
+sp = None  # Initialize the Spotify client later after setting the dynamic redirect URI
+
+@app.before_request
+def setup_spotify_client():
+    """Setup the Spotify client with a dynamic redirect URI."""
+    global sp
+    REDIRECT_URI = f"{request.host_url}callback".rstrip("/")
+    sp = Spotify(auth_manager=SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope=SCOPE,
+    ))
+
 
 # Home route
 @app.route("/")
