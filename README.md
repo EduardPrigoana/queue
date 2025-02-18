@@ -16,3 +16,6 @@ Download and extract the repository, open it, and replace the Spotify Client ID 
 ```pip install -r requirements.txt```  
 then  
 ``python app.py``
+
+## Usage
+Play a track or playlist on the account associated with your API key, then on the web app and add tracks to queue there.
